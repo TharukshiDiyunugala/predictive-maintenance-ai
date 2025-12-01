@@ -1,0 +1,147 @@
+# Predictive Maintenance System Configuration
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5432
+  name: predictive_maintenance
+  user: pm_user
+  password: your_password_here
+  pool_size: 10
+  max_overflow: 20
+
+# Redis Configuration
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password: null
+
+# API Configuration
+api:
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  reload: false
+  log_level: info
+  cors_origins:
+    - http://localhost:3000
+    - http://localhost:8080
+
+# Model Configuration
+models:
+  failure_prediction:
+    algorithm: xgboost
+    features_version: v1
+    model_path: models/trained/failure_prediction.pkl
+    threshold: 0.7
+    retrain_interval_days: 30
+  
+  anomaly_detection:
+    algorithm: isolation_forest
+    contamination: 0.1
+    model_path: models/trained/anomaly_detection.pkl
+  
+  remaining_useful_life:
+    algorithm: lstm
+    sequence_length: 50
+    model_path: models/trained/rul_prediction.h5
+
+# Data Processing
+data_processing:
+  sensor_sampling_rate: 60  # seconds
+  aggregation_window: 300   # seconds
+  buffer_size: 1000
+  cleaning:
+    remove_outliers: true
+    outlier_method: iqr
+    outlier_threshold: 3.0
+    interpolation_method: linear
+    max_missing_ratio: 0.1
+
+# Feature Engineering
+features:
+  time_windows: [5, 15, 30, 60]  # minutes
+  statistical_features:
+    - mean
+    - std
+    - min
+    - max
+    - median
+    - percentile_25
+    - percentile_75
+  derived_features:
+    - rate_of_change
+    - rolling_mean
+    - rolling_std
+    - fft_features
+
+# Monitoring
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+  logging:
+    level: INFO
+    format: json
+    file: logs/system.log
+    rotation: 100 MB
+    retention: 30 days
+  
+# Alerts
+alerts:
+  channels:
+    - email
+    - slack
+    - webhook
+  thresholds:
+    critical: 0.9
+    warning: 0.7
+    info: 0.5
+  email:
+    smtp_server: smtp.gmail.com
+    smtp_port: 587
+    from_address: alerts@company.com
+    to_addresses:
+      - maintenance@company.com
+  slack:
+    webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+  webhook:
+    url: https://your-webhook-endpoint.com/alerts
+    method: POST
+
+# Maintenance Scheduling
+maintenance:
+  optimization_algorithm: genetic
+  constraints:
+    max_concurrent_maintenance: 3
+    min_days_between_maintenance: 7
+    maintenance_duration_hours: 4
+  priorities:
+    critical: 1
+    high: 2
+    medium: 3
+    low: 4
+
+# Training Configuration
+training:
+  validation_split: 0.2
+  test_split: 0.1
+  random_state: 42
+  cross_validation_folds: 5
+  hyperparameter_tuning:
+    enabled: true
+    method: bayesian
+    n_iterations: 50
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+
+# System Configuration
+system:
+  timezone: UTC
+  max_concurrent_predictions: 10
+  cache_ttl: 300  # seconds
+  batch_size: 32
+  n_jobs: -1  # Use all CPU cores
