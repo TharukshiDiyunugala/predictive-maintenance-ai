@@ -29,7 +29,8 @@ def main():
     
     # 2. Preprocess data
     print("\n2. Preprocessing data...")
-    preprocessor = DataPreprocessor()
+    # Don't remove outliers - they indicate failures!
+    preprocessor = DataPreprocessor(config={'remove_outliers': False})
     clean_data = preprocessor.clean_data(data)
     print(f"   Clean data: {len(clean_data)} samples")
     
@@ -44,8 +45,19 @@ def main():
     
     feature_data = engineer.create_features(clean_data, sensor_cols)
     
+    # Drop non-numeric columns (like equipment_id, timestamp) BEFORE dropping NaNs
+    numeric_cols = feature_data.select_dtypes(include=['float64', 'int64', 'float32', 'int32']).columns
+    feature_data = feature_data[numeric_cols]
+    
+    # Check class distribution before dropping NaNs
+    print(f"   Before dropna - Failure rate: {feature_data['failure'].mean():.2%}")
+    
     # Drop rows with NaN (from rolling windows)
     feature_data = feature_data.dropna()
+    
+    # Check class distribution after dropping NaNs
+    print(f"   After dropna - Failure rate: {feature_data['failure'].mean():.2%}")
+    print(f"   Samples remaining: {len(feature_data)}")
     print(f"   Created {len(feature_data.columns)} features")
     
     # 4. Train model
